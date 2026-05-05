@@ -8,7 +8,7 @@
    ========================================================= */
 window.APP_CONFIG = {
   API_URL:
-    "https://script.google.com/macros/s/AKfycbwq-oHqhCtvklqLmu20Plkp5JTNEKSI7Z1-va91BVB8ihSgsxYb37nusmyEQxIqTcd7/exec",
+    "https://script.google.com/macros/s/AKfycbzhkBiLwW-iUo-UPYkzR9K8QBccyrkjVUBTErQkqU1FWMAoAfAnbctWl0d1m3X64Q/exec",
 
   // Maksimal hari ke depan yang bisa dipilih
   MAX_DAYS_AHEAD: 60,
