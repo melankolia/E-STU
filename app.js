@@ -432,7 +432,8 @@
         // Normalize jadwal: Google Sheets may serialize Date objects as ISO UTC strings.
         // Convert to "YYYY-MM-DD HH:mm" in WIB (UTC+7) to match slot comparison keys.
         state.bookings = json
-          .map(b => ({ jadwal: normalizeJadwal(b.jadwal), status: b.status }))
+          .filter(b => b && typeof b === 'object' && b.jadwal && String(b.jadwal).trim() && b.status && String(b.status).trim())
+          .map(b => ({ jadwal: normalizeJadwal(b.jadwal), status: String(b.status).trim() }))
           .filter(b => b.jadwal !== null);
         state.bookingsLoaded = true;
         renderCalendar();
