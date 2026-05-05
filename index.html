@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>E-STU Cimanggis — Konfirmasi Serah Terima Unit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="17" rx="3"></rect>
+            <path d="M16 2v4M8 2v4M3 10h18"></path>
+            <path d="M9 15l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="brand__text">
+          <span class="brand__name">E-STU Cimanggis</span>
+          <span class="brand__tag">Konfirmasi Serah Terima Unit</span>
+        </div>
+      </div>
+      <div class="topbar__meta">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="liveStatus">Layanan online</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    <section class="hero">
+      <p class="eyebrow">Formulir Resmi</p>
+      <h1 class="hero__title">Konfirmasi Serah Terima Unit</h1>
+      <p class="hero__sub">
+        Yth. Bapak/Ibu Konsumen, silakan mengisi form berikut untuk konfirmasi kehadiran
+        dan pemilihan jadwal serah terima unit. Mohon memilih jadwal yang tersedia agar
+        proses dapat berjalan dengan tertib dan nyaman.
+      </p>
+    </section>
+
+    <ol class="stepper" aria-label="Langkah pengisian">
+      <li class="step is-active" data-step="1"><span class="step__num">1</span><span class="step__label">Data Diri</span></li>
+      <li class="step" data-step="2"><span class="step__num">2</span><span class="step__label">Tanggal</span></li>
+      <li class="step" data-step="3"><span class="step__num">3</span><span class="step__label">Waktu</span></li>
+      <li class="step" data-step="4"><span class="step__num">4</span><span class="step__label">Konfirmasi</span></li>
+    </ol>
+
+    <form id="bookingForm" class="card" novalidate>
+      <!-- STEP 1 — Identity -->
+      <section class="panel is-active" data-panel="1">
+        <header class="panel__head">
+          <h2>Data Diri</h2>
+          <p>Lengkapi informasi berikut sesuai data konsumen. Semua kolom wajib diisi.</p>
+        </header>
+
+        <div class="grid grid--2">
+          <label class="field">
+            <span class="field__label">Nama Lengkap</span>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="Nama sesuai identitas" required />
+            <span class="field__hint" data-error-for="name"></span>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Email Aktif</span>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="nama@domain.com" required />
+            <span class="field__hint" data-error-for="email"></span>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Nomor WhatsApp</span>
+            <input id="whatsapp" name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="08xxxxxxxxxx" required />
+            <span class="field__hint" data-error-for="whatsapp"></span>
+          </label>
+
+          <label class="field">
+            <span class="field__label">No. Unit / Blok</span>
+            <input id="unit" name="unit" type="text" placeholder="Mis. A3/12 atau Tower B Lt. 5" required />
+            <span class="field__hint" data-error-for="unit"></span>
+          </label>
+        </div>
+
+        <footer class="panel__foot">
+          <span class="muted">Data Anda hanya digunakan untuk keperluan serah terima unit.</span>
+          <button type="button" class="btn btn--primary" data-next="2">
+            Lanjut
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- STEP 2 — Date -->
+      <section class="panel" data-panel="2">
+        <header class="panel__head">
+          <h2>Pilih Tanggal</h2>
+          <p>Jadwal serah terima tersedia Senin–Sabtu. Hari Minggu & tanggal penuh dinonaktifkan.</p>
+        </header>
+
+        <div class="calendar" id="calendar">
+          <div class="calendar__head">
+            <button type="button" class="icon-btn" id="prevMonth" aria-label="Bulan sebelumnya">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="calendar__title" id="calTitle"></div>
+            <button type="button" class="icon-btn" id="nextMonth" aria-label="Bulan berikutnya">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="calendar__weekdays" aria-hidden="true">
+            <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+          </div>
+          <div class="calendar__grid" id="calGrid" role="grid"></div>
+          <div class="legend">
+            <span class="legend__item"><span class="swatch swatch--avail"></span>Tersedia</span>
+            <span class="legend__item"><span class="swatch swatch--soon"></span>Hampir penuh</span>
+            <span class="legend__item"><span class="swatch swatch--full"></span>Penuh / Tutup</span>
+          </div>
+        </div>
+
+        <footer class="panel__foot">
+          <button type="button" class="btn btn--ghost" data-prev="1">Kembali</button>
+          <button type="button" class="btn btn--primary" data-next="3" id="toStep3" disabled>
+            Lanjut
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- STEP 3 — Time -->
+      <section class="panel" data-panel="3">
+        <header class="panel__head">
+          <h2>Pilih Waktu</h2>
+          <p id="dateSummary" class="muted"></p>
+        </header>
+
+        <div id="slotsWrap" class="slots" role="radiogroup" aria-label="Pilihan waktu"></div>
+
+        <footer class="panel__foot">
+          <button type="button" class="btn btn--ghost" data-prev="2">Kembali</button>
+          <button type="button" class="btn btn--primary" data-next="4" id="toStep4" disabled>
+            Lanjut
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- STEP 4 — Review -->
+      <section class="panel" data-panel="4">
+        <header class="panel__head">
+          <h2>Konfirmasi Jadwal Serah Terima</h2>
+          <p>Periksa kembali data di bawah sebelum mengirim. Pastikan jadwal yang dipilih sudah sesuai.</p>
+        </header>
+
+        <dl class="review" id="review"></dl>
+
+        <label class="check">
+          <input type="checkbox" id="agree" />
+          <span>Saya menyatakan data yang diisi benar dan bersedia hadir pada jadwal serah terima yang telah dipilih.</span>
+        </label>
+
+        <footer class="panel__foot">
+          <button type="button" class="btn btn--ghost" data-prev="3">Kembali</button>
+          <button type="submit" class="btn btn--primary" id="submitBtn" disabled>
+            <span class="btn__label">Konfirmasi Kehadiran</span>
+            <span class="btn__spinner" aria-hidden="true"></span>
+          </button>
+        </footer>
+      </section>
+    </form>
+
+    <!-- Success state -->
+    <section class="card success" id="successCard" hidden>
+      <div class="success__icon" aria-hidden="true">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h2 id="successTitle">Konfirmasi Berhasil Dikirim</h2>
+      <p id="successMsg" class="muted"></p>
+      <dl class="review" id="successReview"></dl>
+      <div class="success__actions">
+        <button type="button" class="btn btn--ghost" id="bookAnother">Isi Formulir Baru</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footnote container">
+    <span>© <span id="year"></span> E-STU Cimanggis — Konfirmasi Serah Terima Unit. Sistem internal.</span>
+    <span class="muted">Dibutuhkan koneksi internet aktif.</span>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
