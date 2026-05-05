@@ -50,7 +50,10 @@
       if (next === 2 && !validateStep1()) return;
       if (next === 3 && !state.form.date) return;
       if (next === 4) {
-        if (!state.form.time) return;
+        if (!state.form.date || !state.form.time) {
+          toast('Pilih jadwal dan waktu terlebih dahulu', 'error');
+          return;
+        }
         renderReview();
       }
       goStep(next);
@@ -300,13 +303,11 @@
         if (disabled) return;
         state.form.time = t;
         $$('.slot', wrap).forEach(b => b.classList.toggle('is-selected', b === btn));
-        $('#toStep4').disabled = false;
       });
 
       wrap.appendChild(btn);
     });
 
-    $('#toStep4').disabled = !state.form.time;
   }
 
   function timeIsPast(now, hhmm) {
@@ -413,7 +414,6 @@
     $('#submitBtn').classList.remove('is-loading');
     $('#submitBtn').disabled = true;
     $('#toStep3').disabled = true;
-    $('#toStep4').disabled = true;
     $('#dateSummary').textContent = '';
     $('#slotsWrap').innerHTML = '';
     goStep(1);
