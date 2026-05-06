@@ -200,6 +200,36 @@ body {
 }
 .panel__foot .muted { font-size: 13px; }
 
+/* ---------------- Type selector ---------------- */
+.type-select {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+}
+.type-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: 12px;
+  border: 2px solid var(--line); cursor: pointer;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.type-card input[type="radio"] { display: none; }
+.type-card__icon {
+  flex-shrink: 0; width: 36px; height: 36px;
+  border-radius: 8px; background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-2); transition: background .15s, color .15s;
+}
+.type-card__body { display: flex; flex-direction: column; gap: 2px; }
+.type-card__title { font-size: 14px; font-weight: 600; color: var(--ink); }
+.type-card__desc  { font-size: 12px; color: var(--muted); }
+.type-card:hover  { border-color: var(--primary); }
+.type-card.is-selected {
+  border-color: var(--primary); background: var(--primary-soft, #eff6ff);
+}
+.type-card.is-selected .type-card__icon {
+  background: var(--primary); color: #fff;
+}
+@media (max-width: 480px) { .type-select { grid-template-columns: 1fr; } }
+
 /* ---------------- Fields ---------------- */
 .grid { display: grid; gap: 16px; }
 .grid--2 { grid-template-columns: repeat(2, 1fr); }
@@ -291,20 +321,22 @@ body {
 .calendar {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 18px 16px;
   background: linear-gradient(180deg, #fff, var(--surface-2));
 }
 .calendar__head {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 12px; margin-bottom: 14px;
 }
 .calendar__title {
+  flex: 1; text-align: center;
   font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   font-weight: 700; font-size: 16px; letter-spacing: -.01em;
+  color: var(--ink);
 }
 .calendar__weekdays {
   display: grid; grid-template-columns: repeat(7, 1fr);
-  gap: 4px; padding: 0 2px 8px;
+  gap: 6px; padding: 0 0 8px;
   font-size: 11px; font-weight: 600; color: var(--muted);
   text-transform: uppercase; letter-spacing: .08em; text-align: center;
 }
@@ -313,6 +345,7 @@ body {
 }
 .day {
   aspect-ratio: 1; min-height: 42px;
+  display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
@@ -320,6 +353,7 @@ body {
   color: var(--ink-2);
   cursor: pointer; position: relative;
   transition: all .15s var(--ease);
+  padding: 0;
 }
 .day:hover:not(:disabled):not(.is-selected) {
   border-color: var(--primary);
@@ -351,13 +385,17 @@ body {
   z-index: 1;
 }
 .day .day__badge {
-  position: absolute; top: 4px; right: 6px;
-  font-size: 9px; line-height: 1; padding: 2px 4px;
-  border-radius: 4px; font-weight: 700;
-  letter-spacing: .04em;
+  position: absolute; top: 4px; right: 4px;
+  font-size: 9px; line-height: 1.1;
+  padding: 2px 5px;
+  border-radius: 999px;
+  font-weight: 700; letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
 }
-.day .day__badge.full { background: var(--danger-soft); color: var(--danger); }
-.day .day__badge.soon { background: var(--warning-soft); color: var(--warning); }
+.day .day__badge.full  { background: var(--danger-soft);  color: var(--danger); }
+.day .day__badge.soon  { background: var(--warning-soft); color: var(--warning); }
+.day .day__badge.avail { background: var(--success-soft); color: var(--success); }
 .day.is-selected .day__badge { display: none; }
 
 .legend {
@@ -367,10 +405,10 @@ body {
   font-size: 12px; color: var(--muted);
 }
 .legend__item { display: inline-flex; align-items: center; gap: 6px; }
-.swatch { width: 10px; height: 10px; border-radius: 3px; }
-.swatch--avail { background: var(--primary); }
-.swatch--soon  { background: #f59e0b; }
-.swatch--full  { background: #cbd5e1; }
+.swatch { width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0; }
+.swatch--avail { background: var(--success); }
+.swatch--soon  { background: var(--warning); }
+.swatch--full  { background: var(--danger); }
 
 /* ---------------- Time slots ---------------- */
 .slots {
@@ -552,20 +590,35 @@ body {
   .field input { height: 48px; font-size: 15px; }
 
   /* Calendar */
-  .calendar { padding: 10px; }
+  .calendar { padding: 12px 10px; border-radius: var(--radius); }
+  .calendar__head { margin-bottom: 10px; gap: 8px; }
+  .calendar__title { font-size: 14.5px; }
+  .calendar__head .icon-btn { width: 34px; height: 34px; border-radius: 9px; }
+  .calendar__head .icon-btn svg { width: 16px; height: 16px; }
   .calendar__grid { gap: 4px; }
   .calendar__weekdays { gap: 4px; font-size: 10px; letter-spacing: .04em; padding-bottom: 6px; }
   /* 44px min = WCAG 2.5.5 touch target minimum */
   .day { font-size: 13px; border-radius: 8px; min-height: 44px; }
   /* Badges: keep visible text (color-only violates WCAG 1.4.1); abbreviate to fit */
-  .day .day__badge { font-size: 8.5px; padding: 1px 3px; top: 3px; right: 3px; letter-spacing: 0; }
-  .legend { gap: 10px; font-size: 11.5px; margin-top: 10px; }
+  .day .day__badge { font-size: 8.5px; padding: 1px 4px; top: 3px; right: 3px; letter-spacing: 0; }
+  .day.is-today::after { bottom: 4px; width: 3px; height: 3px; }
+  .legend {
+    gap: 10px 14px; font-size: 11.5px; margin-top: 10px;
+    justify-content: flex-start;
+  }
 
   /* Time slots — 2 columns on mobile, min 44px touch target */
   .slots { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .slot { padding: 12px; min-height: 44px; }
-  .slot__time { font-size: 15px; }
+  .slot { padding: 11px 12px; min-height: 44px; }
+  .slot__time { font-size: 14.5px; white-space: nowrap; }
   .slot__meta { font-size: 11.5px; }
+
+  /* Type select — single column with tighter padding */
+  .type-select { gap: 10px; margin-bottom: 18px; }
+  .type-card { padding: 12px 14px; }
+  .type-card__icon { width: 34px; height: 34px; }
+  .type-card__title { font-size: 13.5px; }
+  .type-card__desc { font-size: 11.5px; }
 
   /* Review */
   .review { grid-template-columns: 1fr; }
@@ -590,6 +643,27 @@ body {
 }
 
 /* ==========================================================
+   TABLET — 601px – 900px
+   ========================================================== */
+@media (min-width: 601px) and (max-width: 900px) {
+  .container { max-width: 720px; padding: 0 18px; }
+  .panel { padding: 24px; }
+
+  /* Calendar — slightly tighter than desktop */
+  .calendar { padding: 16px 14px; }
+  .calendar__grid { gap: 5px; }
+  .calendar__weekdays { gap: 5px; }
+  .day { font-size: 13.5px; min-height: 46px; }
+
+  /* Slots — keep flexible 2-3 columns */
+  .slots { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+
+  /* Type select — keep two columns, just tighter */
+  .type-select { gap: 10px; }
+  .type-card { padding: 12px 14px; }
+}
+
+/* ==========================================================
    VERY SMALL — ≤ 360px (Galaxy S, older iPhones)
    ========================================================== */
 @media (max-width: 360px) {
@@ -598,6 +672,28 @@ body {
   .step__label { font-size: 9.5px; }
   .brand__name { font-size: 13px; }
   .hero__title { font-size: 20px; }
+
+  /* Calendar — keep usable on cramped screens */
+  .calendar { padding: 10px 8px; }
+  .calendar__head { gap: 6px; }
+  .calendar__title { font-size: 13.5px; }
+  .calendar__head .icon-btn { width: 30px; height: 30px; }
+  .calendar__grid { gap: 3px; }
+  .calendar__weekdays { gap: 3px; font-size: 9.5px; }
+  .day { font-size: 12.5px; min-height: 40px; border-radius: 7px; }
+  .day .day__badge { font-size: 8px; padding: 1px 3px; top: 2px; right: 2px; }
+  .legend { gap: 6px 10px; font-size: 10.5px; }
+  .legend__item { gap: 4px; }
+
+  /* Time slots — stack to single column */
+  .slots { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Type select tighter */
+  .type-card { padding: 11px 12px; gap: 10px; }
+  .type-card__icon { width: 32px; height: 32px; border-radius: 7px; }
+  .type-card__icon svg { width: 18px; height: 18px; }
+  .type-card__title { font-size: 13.5px; }
+  .type-card__desc { font-size: 11.5px; }
 }
 
 /* Reduce motion */

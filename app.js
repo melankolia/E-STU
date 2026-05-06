@@ -11,7 +11,7 @@
   /* ---------------- State ---------------- */
   const state = {
     step: 1,
-    form: { name: "", email: "", whatsapp: "", unit: "", date: "", time: "" },
+    form: { name: "", email: "", whatsapp: "", unit: "", date: "", time: "", type: "" },
     today: startOfDay(new Date()),
     cursor: startOfDay(new Date()), // calendar cursor (1st of visible month)
     bookings: [], // [{jadwal, status}]
@@ -23,9 +23,9 @@
   /* ---------------- Slot rules (mirror backend) ---------------- */
   function getValidSlots(day) {
     if (day >= 1 && day <= 4)
-      return ["09:00", "10:00", "13:00", "14:00", "15:00"];
-    if (day === 5) return ["11:00", "12:00", "13:00", "14:00"];
-    if (day === 6) return ["09:00", "10:00", "11:00", "12:00"];
+      return ["09:00", "10:00", "13:00", "14:00"];
+    if (day === 5) return ["09:00", "10:00", "14:00"];
+    if (day === 6) return ["10:00"]; // Khusus Re-Schedule
     return [];
   }
 
@@ -59,6 +59,7 @@
           renderReview();
         }
         goStep(next);
+        if (next === 2) renderCalendar();
       }),
     );
 
@@ -99,6 +100,19 @@
       el.addEventListener("blur", () => validateField(k));
     });
 
+    $$("[name='bookingType']").forEach((radio) => {
+      radio.addEventListener("change", () => {
+        state.form.type = radio.value;
+        state.form.date = "";
+        state.form.time = "";
+        clearError("type");
+        $$(".type-card").forEach((c) =>
+          c.classList.toggle("is-selected", c.querySelector("input") === radio),
+        );
+        renderCalendar();
+      });
+    });
+
     $("#bookingForm").addEventListener("submit", onSubmit);
   }
 
@@ -108,6 +122,10 @@
     fields.forEach((k) => {
       if (!validateField(k)) ok = false;
     });
+    if (!state.form.type) {
+      setError("type", "Pilih jenis kunjungan");
+      ok = false;
+    }
     if (!ok) toast("Lengkapi data diri terlebih dahulu", "error");
     return ok;
   }
@@ -205,7 +223,11 @@
       const iso = isoDate(date);
       const isPast = date < state.today;
       const isFuture = date > upper;
-      const isClosed = dayOfWeek === 0; // Sunday closed
+      const type = state.form.type;
+      const isClosed =
+        dayOfWeek === 0 ||
+        (type === "Serah Terima" && dayOfWeek === 6) ||
+        (type === "Re-Schedule" && dayOfWeek >= 1 && dayOfWeek <= 5);
 
       const slots = getValidSlots(dayOfWeek);
       const status = dayAvailability(iso, dayOfWeek);
@@ -220,10 +242,10 @@
           b.textContent = "Penuh";
           btn.appendChild(b);
         }
-      } else if (status.soon) {
+      } else {
         const b = document.createElement("span");
-        b.className = "day__badge soon";
-        b.textContent = "Sisa " + status.remaining;
+        b.className = "day__badge" + (status.soon ? " soon" : " avail");
+        b.textContent = status.remaining + " slot";
         btn.appendChild(b);
       }
 
@@ -323,7 +345,7 @@
 
       btn.innerHTML = `
         <span class="slot__time">${h}.00 – ${endH}.00</span>
-        <span class="slot__meta">${past ? "Telah lewat" : full ? "Slot penuh" : cap === Infinity ? "Tersedia" : `Sisa ${remaining} slot`}</span>
+        <span class="slot__meta">${past ? "Telah lewat" : full ? "Slot penuh" : "Tersedia"}</span>
       `;
       if (disabled) btn.disabled = true;
 
@@ -353,6 +375,7 @@
     const phone = formatPhone(f.whatsapp);
 
     $("#review").innerHTML = `
+      <dt>Jenis</dt><dd>${escapeHtml(f.type)}</dd>
       <dt>Nama</dt><dd>${escapeHtml(f.name)}</dd>
       <dt>Email</dt><dd>${escapeHtml(f.email)}</dd>
       <dt>WhatsApp</dt><dd>${escapeHtml(phone)}</dd>
@@ -381,6 +404,25 @@
 
     try {
       const f = state.form;
+
+      if (f.type === "Re-Schedule") {
+        const checkRes = await fetch(
+          `${CFG.API_URL}?email=${encodeURIComponent(f.email)}`,
+          { redirect: "follow" },
+        );
+        const checkJson = await safeJson(checkRes);
+        if (!checkJson || !checkJson.hasBooking) {
+          toast(
+            "Re-Schedule hanya untuk yang sudah memiliki jadwal serah terima sebelumnya.",
+            "error",
+            5000,
+          );
+          btn.classList.remove("is-loading");
+          btn.disabled = false;
+          return;
+        }
+      }
+
       const params = new URLSearchParams({
         name: f.name,
         whatsapp: f.whatsapp,
@@ -427,6 +469,7 @@
     $("#successMsg").textContent =
       "Jadwal serah terima unit Anda telah tercatat. Mohon hadir tepat waktu sesuai jadwal yang dipilih.";
     $("#successReview").innerHTML = `
+      <dt>Jenis</dt><dd>${escapeHtml(f.type)}</dd>
       <dt>Nama</dt><dd>${escapeHtml(f.name)}</dd>
       <dt>Email</dt><dd>${escapeHtml(f.email)}</dd>
       <dt>WhatsApp</dt><dd>${escapeHtml(formatPhone(f.whatsapp))}</dd>
@@ -447,11 +490,15 @@
       unit: "",
       date: "",
       time: "",
+      type: "",
     };
     ["name", "email", "whatsapp", "unit"].forEach((k) => {
       $("#" + k).value = "";
       clearError(k);
     });
+    $$("[name='bookingType']").forEach((r) => (r.checked = false));
+    $$(".type-card").forEach((c) => c.classList.remove("is-selected"));
+    clearError("type");
     $("#successCard").hidden = true;
     $("#bookingForm").hidden = false;
     $(".stepper").style.display = "";
