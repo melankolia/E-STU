@@ -14,7 +14,8 @@
     form: { name: "", email: "", whatsapp: "", unit: "", date: "", time: "", type: "" },
     today: startOfDay(new Date()),
     cursor: startOfDay(new Date()), // calendar cursor (1st of visible month)
-    bookings: [], // [{jadwal, status}]
+    bookings: [], // [{jadwal, status}] — fallback bila backend belum punya ?action=availability
+    availability: null, // { "YYYY-MM-DD": { "HH:mm": sisa } } dari backend
     bookingsLoaded: false,
     bookingsLoading: false,
   };
@@ -271,17 +272,14 @@
     const slots = getValidSlots(dayOfWeek);
     if (slots.length === 0) return { full: true, soon: false, remaining: 0 };
     const cap = capacityFor(dayOfWeek);
-    if (cap === Infinity)
+    if (cap === Infinity && !state.availability)
       return { full: false, soon: false, remaining: Infinity };
 
-    let totalBooked = 0;
-    let totalCapacity = slots.length * cap;
-    slots.forEach((t) => {
-      const key = `${iso} ${t}`;
-      const c = countBooked(key);
-      totalBooked += Math.min(c, cap);
-    });
-    const remaining = totalCapacity - totalBooked;
+    const totalCapacity = slots.length * cap;
+    const remaining = slots.reduce(
+      (sum, t) => sum + remainingFor(iso, t, dayOfWeek),
+      0,
+    );
     return {
       full: remaining <= 0,
       soon:
@@ -289,6 +287,17 @@
         remaining <= Math.max(1, Math.floor(totalCapacity * 0.34)),
       remaining,
     };
+  }
+
+  // Sisa kuota satu slot jam: utamakan angka dari backend, fallback hitung lokal
+  function remainingFor(iso, time, dayOfWeek) {
+    if (state.availability) {
+      const v = state.availability[iso] && state.availability[iso][time];
+      return typeof v === "number" ? v : 0;
+    }
+    const cap = capacityFor(dayOfWeek);
+    if (cap === Infinity) return Infinity;
+    return Math.max(0, cap - countBooked(`${iso} ${time}`));
   }
 
   function countBooked(rawJadwal) {
@@ -315,7 +324,6 @@
     wrap.innerHTML = "";
     const dayOfWeek = dateObj.getDay();
     const slots = getValidSlots(dayOfWeek);
-    const cap = capacityFor(dayOfWeek);
     const iso = isoDate(dateObj);
 
     if (!slots.length) {
@@ -328,9 +336,7 @@
     const isToday = sameDay(dateObj, state.today);
 
     slots.forEach((t) => {
-      const key = `${iso} ${t}`;
-      const booked = countBooked(key);
-      const remaining = cap === Infinity ? Infinity : cap - booked;
+      const remaining = remainingFor(iso, t, dayOfWeek);
 
       const btn = document.createElement("button");
       btn.type = "button";
@@ -431,6 +437,7 @@
         date: f.date,
         time: f.time,
         email: f.email,
+        type: f.type,
       });
 
       const res = await fetch(CFG.API_URL, {
@@ -443,6 +450,7 @@
       if (!json || json.success === false) {
         const msg = (json && json.message) || "Gagal mengirim reservasi.";
         toast(msg, "error", 4500);
+        if (/penuh/i.test(msg)) fetchBookings();
         btn.classList.remove("is-loading");
         btn.disabled = false;
         return;
@@ -519,12 +527,18 @@
     if (state.bookingsLoading) return;
     state.bookingsLoading = true;
     try {
-      const res = await fetch(CFG.API_URL, {
+      const res = await fetch(`${CFG.API_URL}?action=availability`, {
         method: "GET",
         redirect: "follow",
       });
       const json = await safeJson(res);
-      if (Array.isArray(json)) {
+      if (json && json.success && json.slots && typeof json.slots === "object") {
+        state.availability = json.slots;
+        state.bookingsLoaded = true;
+        renderCalendar();
+        if (state.form.date) renderSlots(parseISO(state.form.date));
+      } else if (Array.isArray(json)) {
+        // Backend lama (belum ada ?action=availability) → hitung dari daftar jadwal
         // Normalize jadwal: Google Sheets may serialize Date objects as ISO UTC strings.
         // Convert to "YYYY-MM-DD HH:mm" in WIB (UTC+7) to match slot comparison keys.
         state.bookings = json
