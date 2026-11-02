@@ -152,9 +152,10 @@
   }
 
   function setError(key, msg) {
-    const el = $("#" + key);
+    const el = key === "type" ? $("#typeSelect") : $("#" + key);
     const hint = $(`[data-error-for="${key}"]`);
-    el.parentElement.classList.toggle("has-error", !!msg);
+    if (el && el.parentElement)
+      el.parentElement.classList.toggle("has-error", !!msg);
     if (hint) hint.textContent = msg || "";
   }
 
@@ -504,6 +505,7 @@
     $(".stepper").style.display = "";
     $("#submitBtn").classList.remove("is-loading");
     $("#submitBtn").disabled = true;
+    $("#agree").checked = false;
     $("#toStep3").disabled = true;
     $("#dateSummary").textContent = "";
     $("#slotsWrap").innerHTML = "";
