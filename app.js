@@ -476,7 +476,10 @@
         ? "Reschedule Jadwal Berhasil"
         : "Konfirmasi Berhasil Dikirim";
     $("#successMsg").textContent =
-      "Jadwal serah terima unit Anda telah tercatat. Mohon hadir tepat waktu sesuai jadwal yang dipilih.";
+      "Jadwal serah terima unit Anda telah tercatat. Mohon hadir tepat waktu sesuai jadwal yang dipilih." +
+      (json.emailSent
+        ? ` Detail jadwal juga sudah kami kirim ke ${f.email}, silakan cek kotak masuk Anda.`
+        : "");
     $("#successReview").innerHTML = `
       <dt>Jenis</dt><dd>${escapeHtml(f.type)}</dd>
       <dt>Nama</dt><dd>${escapeHtml(f.name)}</dd>
