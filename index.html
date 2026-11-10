@@ -202,11 +202,69 @@
       <div class="success__icon" aria-hidden="true">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       </div>
-      <h2 id="successTitle">Konfirmasi Berhasil Dikirim</h2>
-      <p id="successMsg" class="muted"></p>
-      <dl class="review" id="successReview"></dl>
-      <div class="success__actions">
-        <button type="button" class="btn btn--ghost" id="bookAnother">Isi Formulir Baru</button>
+      <h2 id="successTitle">Jadwal Anda Sudah Tercatat</h2>
+      <p id="successMsg" class="success__msg"></p>
+
+      <!-- Cara 1 (utama): email konfirmasi -->
+      <div class="proof-email" id="successEmail" hidden>
+        <span class="proof-email__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
+        </span>
+        <div class="proof-email__text">
+          <p>Bukti jadwal sudah kami kirim ke email:</p>
+          <p class="proof-email__addr" id="successEmailAddr"></p>
+          <p>Saat datang, tunjukkan email tersebut kepada petugas.</p>
+        </div>
+      </div>
+
+      <!-- Cara 2 (alternatif): gambar bukti jadwal di HP.
+           Bila email gagal terkirim, ini menjadi bukti utama dan langsung terbuka. -->
+      <div class="alt" id="altProof">
+        <div class="alt__head" id="altHead">
+          <p class="alt__title">Atau, simpan bukti jadwal di HP</p>
+          <p class="alt__desc">Lebih praktis: bisa dibuka kapan saja, tanpa perlu internet.</p>
+        </div>
+
+        <details class="ticket" id="ticketBox">
+          <summary class="ticket__toggle" id="ticketToggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span class="when-closed">Lihat Bukti Jadwal</span>
+            <span class="when-open">Tutup Bukti Jadwal</span>
+            <svg class="ticket__chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+
+          <div class="ticket__body">
+            <div class="ticket__frame" id="ticketFrame" aria-busy="true">
+              <div class="ticket__loading" id="ticketLoading">
+                <span class="ticket__spinner" aria-hidden="true"></span>
+                Menyiapkan bukti jadwal…
+              </div>
+              <img class="ticket__img" id="ticketImg" alt="" hidden />
+            </div>
+
+            <div class="ticket__actions">
+              <button type="button" class="btn btn--primary btn--lg" id="saveTicket" disabled>
+                <svg class="ico-save" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                <svg class="ico-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                <span id="saveTicketLabel">Simpan ke Galeri HP</span>
+              </button>
+              <button type="button" class="btn btn--ghost btn--lg" id="shareTicket" hidden>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+                Kirim lewat WhatsApp
+              </button>
+            </div>
+
+            <p class="ticket__status" id="ticketStatus" role="status" aria-live="polite" hidden></p>
+            <p class="ticket__hint" id="ticketHint">Bisa juga dengan memfoto layar (<i>screenshot</i>), atau tekan lama gambar di atas lalu pilih <b>Simpan</b>.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Cadangan bila tiket gagal dibuat -->
+      <dl class="review" id="successReview" hidden></dl>
+
+      <div class="success__foot">
+        <button type="button" class="btn btn--ghost btn--lg" id="bookAnother">Isi Formulir untuk Unit Lain</button>
       </div>
     </section>
   </main>
